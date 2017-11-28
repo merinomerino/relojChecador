@@ -243,7 +243,6 @@ public class RelojChecador extends JFrame {
 
     private void search() {
         String buscar = null;
-        String f = "";
 
         if (combo.getSelectedItem() == "id_trabajador") {
             buscar = (String) combo.getSelectedItem();
@@ -251,13 +250,6 @@ public class RelojChecador extends JFrame {
             buscar = (String) combo.getSelectedItem();
             tipo = -1;
         }
-//        if (fecha.isSelected() && ES.isSelected()) {
-//            System.out.println("ambos");
-//        } else if (fecha.isSelected()) {
-//            System.out.println("fecha");
-//        } else {
-//            System.out.println("ES");
-//        }
 
         try {
             Class.forName(driver);
@@ -267,20 +259,35 @@ public class RelojChecador extends JFrame {
 
                 st = conexion.createStatement();
 
-                if (tipo == 0) {
-//                    rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = " + tfIDTrabajador.getText());
-                }
-
                 if (cBfecha.isSelected() && cBES.isSelected()) {
-                    rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' and entrada_salida = '" + tfEntradaSalida.getText() + "' and id_trabajador=" + tfIDTrabajador.getText());
+                    if (tipo == -1) {
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' and entrada_salida = '" + tfEntradaSalida.getText() + "' and " + buscar + " ='" + tfIDTrabajador.getText() + "'");
+
+                    } else {
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' and entrada_salida = '" + tfEntradaSalida.getText() + "' and id_trabajador=" + tfIDTrabajador.getText());
+                    }
                     System.out.println("ambos");
                 } else if (cBfecha.isSelected()) {
-
-                    rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
-                    System.out.println("fecha");
-                } else {
-                    rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
+                    if (tipo == -1) {
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' AND " + buscar + " ='" + tfIDTrabajador.getText() + "'");
+                    } else {
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
+                        System.out.println("fecha");
+                    }
+                } else if (cBES.isSelected()) {
+                    if(tipo==-1){
+                        rs = st.executeQuery("SELECT  * from Registro where entrada_salida = '" + tfEntradaSalida.getText() + "' AND " + buscar + " ='" + tfIDTrabajador.getText() + "'");
+                    
+                    }else{
+                    rs = st.executeQuery("SELECT  * from Registro where entrada_salida = '" + tfEntradaSalida.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
                     System.out.println("ES");
+                    }
+                } else if (tipo == 0) {
+                    System.out.println("entro");
+                    rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = " + tfIDTrabajador.getText());
+                } else if (tipo == -1) {
+                    System.out.println("entro");
+                    rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = '" + tfIDTrabajador.getText() + "'");
                 }
                 limpiar();
 
@@ -364,6 +371,8 @@ public class RelojChecador extends JFrame {
         tfIDTrabajador.setText("");
         tfEntradaSalida.setText("");
         tfFecha.setText("");
+        cBfecha.setSelected(false);
+        cBES.setSelected(false);
 
         for (int i = 0; i < dtm.getRowCount(); i++) {
             dtm.removeRow(i);
