@@ -55,8 +55,7 @@ public class RelojChecador extends JFrame {
     final private String contraseña = "12345678";
 
     int tipo = 0;
-    int tipo1 = 0;
-    int tipo2 = 0;
+    
 
     public RelojChecador() {
         super("Ejemplo");
@@ -78,8 +77,8 @@ public class RelojChecador extends JFrame {
         tfEntradaSalida = new JTextField(3);
 
         combo = new JComboBox();
-        cBfecha = new JCheckBox("date", false);
-        cBES = new JCheckBox("entradaSalida", false);
+        cBfecha = new JCheckBox("Date", false);
+        cBES = new JCheckBox("Entrada/Salida", false);
 
         insertar = new JButton("Insertar");
         buscar = new JButton("Buscar");
@@ -117,16 +116,22 @@ public class RelojChecador extends JFrame {
                 }
 
                 tfIDTrabajador.setText(arreglo[0].toString());
+                tfFecha.setText(arreglo[2].toString());
+                tfEntradaSalida.setText(arreglo[4].toString());
             }
 
             @Override
             public void mouseEntered(MouseEvent me) {
                 tfIDTrabajador.setEditable(false);
+                tfFecha.setEditable(false);
+                tfEntradaSalida.setEditable(false);
             }
 
             @Override
             public void mouseExited(MouseEvent me) {
                 tfIDTrabajador.setEditable(true);
+                tfFecha.setEditable(true);
+                tfEntradaSalida.setEditable(true);
             }
         });
 
@@ -206,28 +211,27 @@ public class RelojChecador extends JFrame {
     private void insert() {
 
         String texto = "";
-        String[] cadenaseparada;
-        String direccion = "C:/Users/lokua/Desktop/BD-reloj-checador.txt";
+        String[] particion;
+        String dir = "C:/Users/lokua/Desktop/BD-reloj-checador.txt";
 
         try {
-            FileReader fr = new FileReader(direccion);
+            FileReader fr = new FileReader(dir);
             BufferedReader br = new BufferedReader(fr);
             String linea;
             try {
                 Connection miConexion = DriverManager.getConnection(base, usuario, contraseña);
                 Statement mistate = miConexion.createStatement();
                 while ((linea = br.readLine()) != null) {
-                    cadenaseparada = linea.split("\t");
+                    particion = linea.split("\t");
                     for (int i = 0; i < 1; i++) {
 
                         String instruccion = "INSERT INTO Registro (id_trabajador, nombre, fecha, hora, "
-                                + "entrada_salida) VALUES(" + cadenaseparada[0] + ", '"
-                                + cadenaseparada[1] + "', '" + cadenaseparada[2] + "', '" + cadenaseparada[3]
-                                + "', '" + cadenaseparada[4] + "')";
+                                + "entrada_salida) VALUES(" + particion[0] + ", '"
+                                + particion[1] + "', '" + particion[2] + "', '" + particion[3]
+                                + "', '" + particion[4] + "')";
 
                         mistate.executeUpdate(instruccion);
-                        System.out.println(cadenaseparada[2]);
-                        Object[] fila = {cadenaseparada[0], cadenaseparada[1], cadenaseparada[2], cadenaseparada[3], cadenaseparada[4]};
+                        Object[] fila = {particion[0], particion[1], particion[2], particion[3], particion[4]};
                         dtm.addRow(fila);
                     }
                 }
@@ -275,12 +279,12 @@ public class RelojChecador extends JFrame {
                         System.out.println("fecha");
                     }
                 } else if (cBES.isSelected()) {
-                    if(tipo==-1){
+                    if (tipo == -1) {
                         rs = st.executeQuery("SELECT  * from Registro where entrada_salida = '" + tfEntradaSalida.getText() + "' AND " + buscar + " ='" + tfIDTrabajador.getText() + "'");
-                    
-                    }else{
-                    rs = st.executeQuery("SELECT  * from Registro where entrada_salida = '" + tfEntradaSalida.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
-                    System.out.println("ES");
+
+                    } else {
+                        rs = st.executeQuery("SELECT  * from Registro where entrada_salida = '" + tfEntradaSalida.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
+                        System.out.println("ES");
                     }
                 } else if (tipo == 0) {
                     System.out.println("entro");
