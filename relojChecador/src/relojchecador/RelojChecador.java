@@ -1,35 +1,46 @@
-
 package relojchecador;
 
-
+import java.awt.Checkbox;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javafx.scene.control.RadioButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 public class RelojChecador extends JFrame {
 
-    private JLabel lblIDTrabajador;
-    private JTextField tfIDTrabajador;
+    private JLabel lblIDTrabajador, lblFecha, lblEntradaSalida;
+    private JTextField tfIDTrabajador, tfFecha, tfEntradaSalida;
     private JComboBox combo;
-    private JButton insertar, buscar, borrar;
+    private JCheckBox cBfecha, cBES;
+    private JButton insertar, buscar, borrar, Restablecer;
     private JTable tabla;
     private DefaultTableModel dtm;
     private JScrollPane scroll;
@@ -43,6 +54,10 @@ public class RelojChecador extends JFrame {
     final private String usuario = "root";
     final private String contraseña = "12345678";
 
+    int tipo = 0;
+    int tipo1 = 0;
+    int tipo2 = 0;
+
     public RelojChecador() {
         super("Ejemplo");
         setLayout(new FlowLayout());
@@ -55,14 +70,21 @@ public class RelojChecador extends JFrame {
 
     private void crear() {
         lblIDTrabajador = new JLabel("ID trabajador");
+        lblFecha = new JLabel("Fecha");
+        lblEntradaSalida = new JLabel("I/O");
 
         tfIDTrabajador = new JTextField(10);
+        tfFecha = new JTextField(10);
+        tfEntradaSalida = new JTextField(3);
 
         combo = new JComboBox();
+        cBfecha = new JCheckBox("date", false);
+        cBES = new JCheckBox("entradaSalida", false);
 
         insertar = new JButton("Insertar");
         buscar = new JButton("Buscar");
         borrar = new JButton("Borrar");
+        Restablecer = new JButton("Restablecer ");
 
         dtm = new DefaultTableModel();
 
@@ -74,11 +96,11 @@ public class RelojChecador extends JFrame {
     }
 
     private void construir() {
+        tfFecha.setText(null);
+        tfEntradaSalida.setText(null);
+
         combo.addItem("id_trabajador");
         combo.addItem("nombre");
-        combo.addItem("fecha");
-        combo.addItem("hora");
-
         dtm.addColumn("ID trabajador");
         dtm.addColumn("Nombre");
         dtm.addColumn("Fecha");
@@ -108,21 +130,30 @@ public class RelojChecador extends JFrame {
             }
         });
 
-        scroll.setPreferredSize(new Dimension(400, 200));
+        scroll.setPreferredSize(new Dimension(520, 200));
 
         insertar.addActionListener(objManejador);
         buscar.addActionListener(objManejador);
         borrar.addActionListener(objManejador);
+        Restablecer.addActionListener(objManejador);
     }
 
     private void agregar() {
         add(combo);
         add(lblIDTrabajador);
         add(tfIDTrabajador);
+        add(lblFecha);
+        add(tfFecha);
+        add(lblEntradaSalida);
+        add(tfEntradaSalida);
+        add(cBfecha);
+        add(cBES);
         add(insertar);
         add(buscar);
         add(borrar);
+        add(Restablecer);
         add(scroll);
+
     }
 
     private void mostrarTodo() {
@@ -165,6 +196,10 @@ public class RelojChecador extends JFrame {
             if (ae.getSource() == borrar) {
                 delete();
             }
+            if (ae.getSource() == Restablecer) {
+                limpiar();
+                mostrarTodo();
+            }
         }
     }
 
@@ -191,7 +226,7 @@ public class RelojChecador extends JFrame {
                                 + "', '" + cadenaseparada[4] + "')";
 
                         mistate.executeUpdate(instruccion);
-
+                        System.out.println(cadenaseparada[2]);
                         Object[] fila = {cadenaseparada[0], cadenaseparada[1], cadenaseparada[2], cadenaseparada[3], cadenaseparada[4]};
                         dtm.addRow(fila);
                     }
@@ -208,31 +243,45 @@ public class RelojChecador extends JFrame {
 
     private void search() {
         String buscar = null;
-        int tipo = 0;
+        String f = "";
 
         if (combo.getSelectedItem() == "id_trabajador") {
             buscar = (String) combo.getSelectedItem();
-        }
-        if (combo.getSelectedItem() == "nombre") {
+        } else {
             buscar = (String) combo.getSelectedItem();
             tipo = -1;
         }
-        if (combo.getSelectedItem() == "fecha") {
-            buscar = (String) combo.getSelectedItem();
-            tipo = -1;
-        }
-       
+//        if (fecha.isSelected() && ES.isSelected()) {
+//            System.out.println("ambos");
+//        } else if (fecha.isSelected()) {
+//            System.out.println("fecha");
+//        } else {
+//            System.out.println("ES");
+//        }
+
         try {
             Class.forName(driver);
             conexion = DriverManager.getConnection(base, usuario, contraseña);
 
             if (!conexion.isClosed()) {
-                st = conexion.createStatement();
-                if (tipo == 0) {
-                    rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = " + tfIDTrabajador.getText());
-                }
-                rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = " + "'" + tfIDTrabajador.getText() + "'");
 
+                st = conexion.createStatement();
+
+                if (tipo == 0) {
+//                    rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = " + tfIDTrabajador.getText());
+                }
+
+                if (cBfecha.isSelected() && cBES.isSelected()) {
+                    rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' and entrada_salida = '" + tfEntradaSalida.getText() + "' and id_trabajador=" + tfIDTrabajador.getText());
+                    System.out.println("ambos");
+                } else if (cBfecha.isSelected()) {
+
+                    rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
+                    System.out.println("fecha");
+                } else {
+                    rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFecha.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
+                    System.out.println("ES");
+                }
                 limpiar();
 
                 while (rs.next()) {
@@ -264,7 +313,32 @@ public class RelojChecador extends JFrame {
         }
     }
 
-    public void filtro() {
+    public void Reportes() {
+//            RelojChecador re = new RelojChecador();//CREAMOS UN OBJETO DE LA CLASE REPORTES
+//        String ruta = "ReportesTUTO\\fotos.jasper";//RUTA DONDE TIENEN SU REPORTE --
+//        //ABRIR CUADRO DE DIALOGO PARA GUARDAR EL ARCHIVO         
+//        JFileChooser fileChooser = new JFileChooser();
+//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("todos los archivos *.PDF", "pdf", "PDF"));//filtro para ver solo archivos .pdf
+//        int seleccion = fileChooser.showSaveDialog(null);
+//        try {
+//            if (seleccion == JFileChooser.APPROVE_OPTION) {//comprueba si ha presionado el boton de aceptar
+//                File JFC = fileChooser.getSelectedFile();
+//                String PATH = JFC.getAbsolutePath();//obtenemos la direccion del archivo + el nombre a guardar
+//                try (PrintWriter printwriter = new PrintWriter(JFC)) {
+//                    printwriter.print(ruta);
+//                }
+//                re.(ruta, PATH);//mandamos como parametros la ruta del archivo a compilar y el nombre y ruta donde se guardaran    
+//                //comprobamos si a la hora de guardar obtuvo la extension y si no se la asignamos
+//                if (!(PATH.endsWith(".pdf"))) {
+//                    File temp = new File(PATH + ".pdf");
+//                    JFC.renameTo(temp);//renombramos el archivo
+//                }
+//                JOptionPane.showMessageDialog(null, "Esto puede tardar unos segundos,espere porfavor", "Estamos Generando el Reporte", JOptionPane.WARNING_MESSAGE);
+//                JOptionPane.showMessageDialog(null, "Documento Exportado Exitosamente!", "Guardado exitoso!", JOptionPane.INFORMATION_MESSAGE);
+//            }
+//        } catch (FileNotFoundException | HeadlessException e) {//por alguna excepcion salta un mensaje de error
+//            JOptionPane.showMessageDialog(null, "Error al Exportar el archivo!", "Oops! Error", JOptionPane.ERROR_MESSAGE);
+//        }
 
     }
 
@@ -288,6 +362,8 @@ public class RelojChecador extends JFrame {
 
     private void limpiar() {
         tfIDTrabajador.setText("");
+        tfEntradaSalida.setText("");
+        tfFecha.setText("");
 
         for (int i = 0; i < dtm.getRowCount(); i++) {
             dtm.removeRow(i);
@@ -299,12 +375,9 @@ public class RelojChecador extends JFrame {
         RelojChecador base = new RelojChecador();
 
         base.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        base.setSize(450, 330);
+        base.setSize(580, 310);
         base.setLocation(200, 200);
         base.setVisible(true);
 
     }
 }
-
-    
-
