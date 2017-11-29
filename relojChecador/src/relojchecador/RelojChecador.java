@@ -1,8 +1,15 @@
 package relojchecador;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.Checkbox;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -40,7 +48,7 @@ public class RelojChecador extends JFrame {
     private JTextField tfIDTrabajador, tfFecha, tfEntradaSalida;
     private JComboBox combo;
     private JCheckBox cBfecha, cBES;
-    private JButton insertar, buscar, borrar, Restablecer;
+    private JButton insertar, buscar, borrar, Restablecer, reporte;
     private JTable tabla;
     private DefaultTableModel dtm;
     private JScrollPane scroll;
@@ -54,8 +62,8 @@ public class RelojChecador extends JFrame {
     final private String usuario = "root";
     final private String contraseña = "12345678";
 
+    Object[] prueba;
     int tipo = 0;
-    
 
     public RelojChecador() {
         super("Ejemplo");
@@ -84,6 +92,7 @@ public class RelojChecador extends JFrame {
         buscar = new JButton("Buscar");
         borrar = new JButton("Borrar");
         Restablecer = new JButton("Restablecer ");
+        reporte = new JButton("Reporte");
 
         dtm = new DefaultTableModel();
 
@@ -141,6 +150,7 @@ public class RelojChecador extends JFrame {
         buscar.addActionListener(objManejador);
         borrar.addActionListener(objManejador);
         Restablecer.addActionListener(objManejador);
+        reporte.addActionListener(objManejador);
     }
 
     private void agregar() {
@@ -157,6 +167,7 @@ public class RelojChecador extends JFrame {
         add(buscar);
         add(borrar);
         add(Restablecer);
+        add(reporte);
         add(scroll);
 
     }
@@ -172,11 +183,11 @@ public class RelojChecador extends JFrame {
                 rs = st.executeQuery("SELECT * FROM Registro");
 
                 while (rs.next()) {
-                    Object[] fila = new Object[dtm.getColumnCount()];
+                    prueba = new Object[dtm.getColumnCount()];
                     for (int i = 0; i < dtm.getColumnCount(); i++) {
-                        fila[i] = rs.getObject(i + 1);
+                        prueba[i] = rs.getObject(i + 1);
                     }
-                    dtm.addRow(fila);
+                    dtm.addRow(prueba);
                 }
                 conexion.close();
             }
@@ -204,6 +215,9 @@ public class RelojChecador extends JFrame {
             if (ae.getSource() == Restablecer) {
                 limpiar();
                 mostrarTodo();
+            }
+            if (ae.getSource() == reporte) {
+                Reportes();
             }
         }
     }
@@ -325,31 +339,48 @@ public class RelojChecador extends JFrame {
     }
 
     public void Reportes() {
-//            RelojChecador re = new RelojChecador();//CREAMOS UN OBJETO DE LA CLASE REPORTES
-//        String ruta = "ReportesTUTO\\fotos.jasper";//RUTA DONDE TIENEN SU REPORTE --
-//        //ABRIR CUADRO DE DIALOGO PARA GUARDAR EL ARCHIVO         
-//        JFileChooser fileChooser = new JFileChooser();
-//        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("todos los archivos *.PDF", "pdf", "PDF"));//filtro para ver solo archivos .pdf
-//        int seleccion = fileChooser.showSaveDialog(null);
-//        try {
-//            if (seleccion == JFileChooser.APPROVE_OPTION) {//comprueba si ha presionado el boton de aceptar
-//                File JFC = fileChooser.getSelectedFile();
-//                String PATH = JFC.getAbsolutePath();//obtenemos la direccion del archivo + el nombre a guardar
-//                try (PrintWriter printwriter = new PrintWriter(JFC)) {
-//                    printwriter.print(ruta);
-//                }
-//                re.(ruta, PATH);//mandamos como parametros la ruta del archivo a compilar y el nombre y ruta donde se guardaran    
-//                //comprobamos si a la hora de guardar obtuvo la extension y si no se la asignamos
-//                if (!(PATH.endsWith(".pdf"))) {
-//                    File temp = new File(PATH + ".pdf");
-//                    JFC.renameTo(temp);//renombramos el archivo
-//                }
-//                JOptionPane.showMessageDialog(null, "Esto puede tardar unos segundos,espere porfavor", "Estamos Generando el Reporte", JOptionPane.WARNING_MESSAGE);
-//                JOptionPane.showMessageDialog(null, "Documento Exportado Exitosamente!", "Guardado exitoso!", JOptionPane.INFORMATION_MESSAGE);
-//            }
-//        } catch (FileNotFoundException | HeadlessException e) {//por alguna excepcion salta un mensaje de error
-//            JOptionPane.showMessageDialog(null, "Error al Exportar el archivo!", "Oops! Error", JOptionPane.ERROR_MESSAGE);
-//        }
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\lokua\\Desktop\\Report.pdf"));
+
+            document.open();
+            document.add(new Paragraph("Reporte \n", FontFactory.getFont(FontFactory.TIMES_BOLD, 30, Font.ITALIC, BaseColor.RED)));
+            document.add(new Paragraph("    "));
+//  
+//   document.add(new Paragraph("Reporte",FontFactory.getFont(FontFactory.TIMES_BOLD)));
+
+            PdfPTable table = new PdfPTable(dtm.getColumnCount());
+            table.addCell("id_trabajador");
+            table.addCell("nombre");
+            table.addCell("Fecha");
+            table.addCell("Hora");
+            table.addCell("EntradasSalidas");
+//    document.add(table);
+
+            for (int i = 0; i < dtm.getRowCount(); i++) {
+                for (int j = 0; j < dtm.getColumnCount(); j++) {
+                    System.out.println(dtm.getValueAt(i, j).toString());
+                    table.addCell(dtm.getValueAt(i, j).toString());
+                }
+
+            }
+            document.add(table);
+//    table.addCell(dtm.getValueAt(1, 1).toString());
+//    table.addCell("nombre");
+//    table.addCell("fechaa");
+//    table.addCell("hora");
+
+////                    Object[] arreglo= new Object[dtm.getColumnCount()];
+//                    PdfPTable table = new PdfPTable(dtm.getColumnCount());
+//                    for (int i = 0; i < dtm.getColumnCount(); i++) {
+//                        System.out.println(prueba[i]);
+//                        table.addCell(rs.getObject(i + 1).toString());
+//                    }
+            document.close();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
 
     }
 
