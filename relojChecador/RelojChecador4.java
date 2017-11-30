@@ -1,52 +1,40 @@
 package relojchecador;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+//import com.itextpdf.text.BaseColor;
+//import com.itextpdf.text.Document;
+//import com.itextpdf.text.FontFactory;
+//import com.itextpdf.text.Paragraph;
+//import com.itextpdf.text.pdf.PdfPTable;
+//import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import javafx.scene.control.RadioButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
-public class RelojChecador extends JFrame {
+public class RelojChecador4 extends JFrame {
 
     private JLabel lblBuscarPor, lblIDTrabajador, lblFechaInicial, lblFechaFinal, lblEntradaSalida;
     private JTextField tfIDTrabajador, tfFechaI, tfFechaF, tfEntradaSalida;
@@ -57,7 +45,7 @@ public class RelojChecador extends JFrame {
     private JTable tabla;
     private DefaultTableModel dtm;
     private JScrollPane scroll;
-    Manejador objManejador;
+    private Manejador objManejador;
     private Connection conexion;
     private Statement st;
     private ResultSet rs;
@@ -71,7 +59,7 @@ public class RelojChecador extends JFrame {
     Object[] prueba;
     int tipo = 0;
 
-    public RelojChecador() {
+    public RelojChecador4() {
         super("Ejemplo");
         setLayout(new BorderLayout());
 
@@ -150,7 +138,6 @@ public class RelojChecador extends JFrame {
 
                 tfIDTrabajador.setText(arreglo[0].toString());
                 tfFechaI.setText(arreglo[2].toString());
-                tfFechaF.setText(arreglo[2].toString());
                 tfEntradaSalida.setText(arreglo[4].toString());
             }
 
@@ -158,7 +145,6 @@ public class RelojChecador extends JFrame {
             public void mouseEntered(MouseEvent me) {
                 tfIDTrabajador.setEditable(false);
                 tfFechaI.setEditable(false);
-                tfFechaF.setEditable(false);
                 tfEntradaSalida.setEditable(false);
             }
 
@@ -166,7 +152,6 @@ public class RelojChecador extends JFrame {
             public void mouseExited(MouseEvent me) {
                 tfIDTrabajador.setEditable(true);
                 tfFechaI.setEditable(true);
-                tfFechaF.setEditable(true);
                 tfEntradaSalida.setEditable(true);
             }
         });
@@ -324,7 +309,9 @@ public class RelojChecador extends JFrame {
             buscar = (String) combo.getSelectedItem();
             tipo = -1;
         }
-        
+        if (tfFechaF != null) {
+            tipo = 3;
+        }
 
         try {
             Class.forName(driver);
@@ -336,34 +323,19 @@ public class RelojChecador extends JFrame {
 
                 if (cBfecha.isSelected() && cBES.isSelected()) {
                     if (tipo == -1) {
-                        rs = st.executeQuery("SELECT  * from Registro "
-                                + "where  entrada_salida = '" + tfEntradaSalida.getText()
-                                + "' and " + buscar + "= '" + tfIDTrabajador.getText()
-                                + "' and fecha between '" + tfFechaI.getText() + "' and '" + tfFechaF.getText() + "'");
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFechaI.getText() + "' and entrada_salida = '" + tfEntradaSalida.getText() + "' and " + buscar + " ='" + tfIDTrabajador.getText() + "'");
 
                     } else {
-                        rs = st.executeQuery("SELECT  * from Registro "
-                                + "where  entrada_salida = '" + tfEntradaSalida.getText()
-                                + "' and " + buscar + "=" + tfIDTrabajador.getText()
-                                + " and fecha between '" + tfFechaI.getText() + "' and '" + tfFechaF.getText() + "'");
-
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFechaI.getText() + "' and entrada_salida = '" + tfEntradaSalida.getText() + "' and id_trabajador=" + tfIDTrabajador.getText());
                     }
                     System.out.println("ambos");
-
                 } else if (cBfecha.isSelected()) {
                     if (tipo == -1) {
-                        System.out.println("-1");
-                        rs = st.executeQuery("SELECT  * from Registro "
-                                + "where  " + buscar + "= '" + tfIDTrabajador.getText()
-                                + "' and fecha between '" + tfFechaI.getText() + "' and '" + tfFechaF.getText() + "'");
-
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFechaI.getText() + "' AND " + buscar + " ='" + tfIDTrabajador.getText() + "'");
                     } else {
-                        rs = st.executeQuery("SELECT  * from Registro "
-                                + "where  " + buscar + "= " + tfIDTrabajador.getText()
-                                + " and fecha between '" + tfFechaI.getText() + "' and '" + tfFechaF.getText() + "'");
+                        rs = st.executeQuery("SELECT  * from Registro where fecha = '" + tfFechaI.getText() + "' AND id_trabajador=" + tfIDTrabajador.getText());
                         System.out.println("fecha");
                     }
-
                 } else if (cBES.isSelected()) {
                     if (tipo == -1) {
                         rs = st.executeQuery("SELECT  * from Registro where entrada_salida = '" + tfEntradaSalida.getText() + "' AND " + buscar + " ='" + tfIDTrabajador.getText() + "'");
@@ -376,10 +348,11 @@ public class RelojChecador extends JFrame {
                     System.out.println("entro");
                     rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = " + tfIDTrabajador.getText());
                 } else if (tipo == -1) {
-                   
+                    System.out.println("entro");
                     rs = st.executeQuery("SELECT * FROM Registro where " + buscar + " = '" + tfIDTrabajador.getText() + "'");
+                } else if (tipo == 3) {
+                    rs = st.executeQuery("select * from Registro where fecha between '" + tfFechaI.getText() + "' and '" + tfFechaF.getText() + "'");
                 }
-                
                 limpiar();
 
                 while (rs.next()) {
@@ -412,32 +385,30 @@ public class RelojChecador extends JFrame {
     }
 
     public void Reportes() {
-        System.out.println("reporte");
-        try {
-            Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\lokua\\Desktop\\Report.pdf"));
-
-            document.open();
-            document.add(new Paragraph("Reporte \n", FontFactory.getFont(FontFactory.TIMES_BOLD, 30, Font.ITALIC, BaseColor.RED)));
-            document.add(new Paragraph("    "));
-            PdfPTable table = new PdfPTable(dtm.getColumnCount());
-            table.addCell("id_trabajador");
-            table.addCell("nombre");
-            table.addCell("Fecha");
-            table.addCell("Hora");
-            table.addCell("EntradasSalidas");
-            for (int i = 0; i < dtm.getRowCount(); i++) {
-                for (int j = 0; j < dtm.getColumnCount(); j++) {
-                    table.addCell(dtm.getValueAt(i, j).toString());
-                }
-
-            }
-            document.add(table);
-            document.close();
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
+//        try {
+//            Document document = new Document();
+//            PdfWriter.getInstance(document, new FileOutputStream("C:\\Users\\lokua\\Desktop\\Report.pdf"));
+//
+//            document.open();
+//            document.add(new Paragraph("Reporte \n", FontFactory.getFont(FontFactory.TIMES_BOLD, 30, Font.ITALIC, BaseColor.RED)));
+//            document.add(new Paragraph("    "));
+//            PdfPTable table = new PdfPTable(dtm.getColumnCount());
+//            table.addCell("id_trabajador");
+//            table.addCell("nombre");
+//            table.addCell("Fecha");
+//            table.addCell("Hora");
+//            table.addCell("EntradasSalidas");
+//            for (int i = 0; i < dtm.getRowCount(); i++) {
+//                for (int j = 0; j < dtm.getColumnCount(); j++) {
+//                    table.addCell(dtm.getValueAt(i, j).toString());
+//                }
+//
+//            }
+//            document.add(table);
+//
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, e);
+//        }
 
     }
 
@@ -473,12 +444,12 @@ public class RelojChecador extends JFrame {
     }
 
     public static void main(String[] args) {
-        RelojChecador base = new RelojChecador();
+        RelojChecador4 reloj = new RelojChecador4();
 
-        base.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        base.setSize(580, 310);
-        base.setLocation(200, 200);
-        base.setVisible(true);
+        reloj.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        reloj.setSize(580, 310);
+        reloj.setLocation(200, 200);
+        reloj.setVisible(true);
 
     }
 }
