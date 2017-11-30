@@ -47,7 +47,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 //Nombre de la clase extendiendo de un frame para el trabajo de la ventana
 public class RelojChecador extends JFrame {
-//Declaracion de botones 
+//Declaracion de nombre de los botones,textos,panel,etc... en forma private para una proteccion al programa
     private JLabel lblBuscarPor, lblIDTrabajador, lblFechaInicial, lblFechaFinal, lblEntradaSalida;
     private JTextField tfIDTrabajador, tfFechaI, tfFechaF, tfEntradaSalida;
     private Font fuente;
@@ -129,10 +129,10 @@ public class RelojChecador extends JFrame {
         lblFechaInicial.setFont(fuente);
         lblFechaFinal.setFont(fuente);
         lblEntradaSalida.setFont(fuente);
-
+//items
         combo.addItem("id_trabajador");
         combo.addItem("nombre");
-
+//columnas
         dtm.addColumn("ID trabajador");
         dtm.addColumn("Nombre");
         dtm.addColumn("Fecha");
