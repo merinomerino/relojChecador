@@ -1,5 +1,5 @@
 package relojchecador;
-
+//Importaciones librerias
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.FontFactory;
@@ -45,9 +45,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-
+//Nombre de la clase extendiendo de un frame para el trabajo de la ventana
 public class RelojChecador extends JFrame {
-
+//Declaracion de botones 
     private JLabel lblBuscarPor, lblIDTrabajador, lblFechaInicial, lblFechaFinal, lblEntradaSalida;
     private JTextField tfIDTrabajador, tfFechaI, tfFechaF, tfEntradaSalida;
     private Font fuente;
@@ -62,7 +62,7 @@ public class RelojChecador extends JFrame {
     private Statement st;
     private ResultSet rs;
     private JPanel panel1, panel2, panel3, panel4, panel5, panel6, panel7, panel8;
-
+//Datos de la conexion a base de datos
     final private String driver = "com.mysql.jdbc.Driver";
     final private String base = "jdbc:mysql://localhost:3306/RelojChecador";
     final private String usuario = "root";
@@ -74,14 +74,14 @@ public class RelojChecador extends JFrame {
     public RelojChecador() {
         super("Ejemplo");
         setLayout(new BorderLayout());
-
+//metodos para inicializar
         crear();
         construir();
         agregar();
         mostrarTodo();
     }
 
-    private void crear() {
+    private void crear() {//Creacion de nombres para la ventana en la interfaz
         lblBuscarPor = new JLabel("Buscar por");
         lblIDTrabajador = new JLabel("ID trabajador");
         lblFechaInicial = new JLabel("Fecha Inicio");
@@ -122,7 +122,7 @@ public class RelojChecador extends JFrame {
         panel7 = new JPanel();
         panel8 = new JPanel();
     }
-
+//Construccion de los datos en la fuente para la tabla
     private void construir() {
         lblBuscarPor.setFont(fuente);
         lblIDTrabajador.setFont(fuente);
@@ -185,7 +185,7 @@ public class RelojChecador extends JFrame {
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));
         panel8.setLayout(new BorderLayout());
     }
-
+//Agregacion en el panel
     private void agregar() {
         panel1.add(lblBuscarPor);
         panel1.add(combo);
@@ -227,7 +227,7 @@ public class RelojChecador extends JFrame {
         add(scroll, BorderLayout.CENTER);
 
     }
-
+//Mostrar los datos almacenados de la informacion
     private void mostrarTodo() {
         try {
             Class.forName(driver);
@@ -252,7 +252,7 @@ public class RelojChecador extends JFrame {
             System.err.println("ERROR AL MOSTRAR TODOS EN TABLA\n" + ex.getMessage());
         }
     }
-
+//clase manejadora para las acciones del usuario al realizar alguna ejecucion del programa
     private class Manejador implements ActionListener {
 
         @Override
@@ -277,7 +277,7 @@ public class RelojChecador extends JFrame {
             }
         }
     }
-
+//Insertar la informacion para iniciar desde el txt
     private void insert() {
 
         String texto = "";
@@ -314,7 +314,7 @@ public class RelojChecador extends JFrame {
             System.out.println("No se encontro archivo");
         }
     }
-
+//Buscar la informacion en el documento
     private void search() {
         String buscar = null;
 
@@ -410,7 +410,7 @@ public class RelojChecador extends JFrame {
             System.err.println("ERROR AL BUSCAR\n" + ex.getMessage());
         }
     }
-
+//Guardado en el pdf
     public void Reportes() {
         System.out.println("reporte");
         try {
@@ -440,7 +440,7 @@ public class RelojChecador extends JFrame {
         }
 
     }
-
+//Borrar la informacion
     private void delete() {
         try {
             Class.forName(driver);
@@ -458,7 +458,7 @@ public class RelojChecador extends JFrame {
             System.err.println("ERROR AL BORRAR\n" + ex.getMessage());
         }
     }
-
+//Limpiar (vaciar la informacion)
     private void limpiar() {
         tfIDTrabajador.setText("");
         tfEntradaSalida.setText("");
@@ -471,7 +471,7 @@ public class RelojChecador extends JFrame {
             i -= 1;
         }
     }
-
+//Visibilidad en la ventana
     public static void main(String[] args) {
         RelojChecador base = new RelojChecador();
 
