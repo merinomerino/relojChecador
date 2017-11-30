@@ -80,8 +80,8 @@ public class RelojChecador extends JFrame {
         agregar();
         mostrarTodo();
     }
-
-    private void crear() {//Creacion de nombres para la ventana en la interfaz
+//Creacion de nombres para la ventana en la interfaz bonotes,label,tablaa,field,text,box,etc....
+    private void crear() {
         lblBuscarPor = new JLabel("Buscar por");
         lblIDTrabajador = new JLabel("ID trabajador");
         lblFechaInicial = new JLabel("Fecha Inicio");
