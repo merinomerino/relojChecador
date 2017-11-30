@@ -1,5 +1,5 @@
 package relojchecador;
-
+//Importacion de las librerias
 //import com.itextpdf.text.BaseColor;
 //import com.itextpdf.text.Document;
 //import com.itextpdf.text.FontFactory;
@@ -33,9 +33,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-
+//Clase de reloj checador
 public class RelojChecador4 extends JFrame {
-
+//Nombre de los frames creados
     private JLabel lblBuscarPor, lblIDTrabajador, lblFechaInicial, lblFechaFinal, lblEntradaSalida;
     private JTextField tfIDTrabajador, tfFechaI, tfFechaF, tfEntradaSalida;
     private Font fuente;
@@ -50,7 +50,7 @@ public class RelojChecador4 extends JFrame {
     private Statement st;
     private ResultSet rs;
     private JPanel panel1, panel2, panel3, panel4, panel5, panel6, panel7, panel8;
-
+//Direccion de la conexion de base de datos
     final private String driver = "com.mysql.jdbc.Driver";
     final private String base = "jdbc:mysql://localhost:3306/RelojChecador";
     final private String usuario = "root";
@@ -62,13 +62,13 @@ public class RelojChecador4 extends JFrame {
     public RelojChecador4() {
         super("Ejemplo");
         setLayout(new BorderLayout());
-
+//Inicializacion de los metodos
         crear();
         construir();
         agregar();
         mostrarTodo();
     }
-
+//Creacion de las caracteristicas en la interfaz label,boton,fiel,box,etc...
     private void crear() {
         lblBuscarPor = new JLabel("Buscar por");
         lblIDTrabajador = new JLabel("ID trabajador");
@@ -110,7 +110,7 @@ public class RelojChecador4 extends JFrame {
         panel7 = new JPanel();
         panel8 = new JPanel();
     }
-
+//Construccion de los nombres de la fuente
     private void construir() {
         lblBuscarPor.setFont(fuente);
         lblIDTrabajador.setFont(fuente);
@@ -170,7 +170,7 @@ public class RelojChecador4 extends JFrame {
         panel5.setLayout(new BoxLayout(panel5, BoxLayout.Y_AXIS));
         panel8.setLayout(new BorderLayout());
     }
-
+//Agregacion al panel
     private void agregar() {
         panel1.add(lblBuscarPor);
         panel1.add(combo);
@@ -212,7 +212,7 @@ public class RelojChecador4 extends JFrame {
         add(scroll, BorderLayout.CENTER);
 
     }
-
+//Mostrar la informacion del registro
     private void mostrarTodo() {
         try {
             Class.forName(driver);
@@ -237,7 +237,7 @@ public class RelojChecador4 extends JFrame {
             System.err.println("ERROR AL MOSTRAR TODOS EN TABLA\n" + ex.getMessage());
         }
     }
-
+//Clase manejadora para las ejecuciones en el programa
     private class Manejador implements ActionListener {
 
         @Override
@@ -262,7 +262,7 @@ public class RelojChecador4 extends JFrame {
             }
         }
     }
-
+//Tomado de la informacion de txt 
     private void insert() {
 
         String texto = "";
@@ -299,7 +299,7 @@ public class RelojChecador4 extends JFrame {
             System.out.println("No se encontro archivo");
         }
     }
-
+//Metodo de buscar la informacion de la tabla
     private void search() {
         String buscar = null;
 
@@ -411,7 +411,7 @@ public class RelojChecador4 extends JFrame {
 //        }
 
     }
-
+//Borrar el registros de la tabla
     private void delete() {
         try {
             Class.forName(driver);
@@ -429,7 +429,7 @@ public class RelojChecador4 extends JFrame {
             System.err.println("ERROR AL BORRAR\n" + ex.getMessage());
         }
     }
-
+//Limpiar las areas de los text
     private void limpiar() {
         tfIDTrabajador.setText("");
         tfEntradaSalida.setText("");
@@ -442,7 +442,7 @@ public class RelojChecador4 extends JFrame {
             i -= 1;
         }
     }
-
+//Visibilidad de la ventana
     public static void main(String[] args) {
         RelojChecador4 reloj = new RelojChecador4();
 
